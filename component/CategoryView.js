@@ -1,23 +1,23 @@
-import React, {useState} from 'react';
-import {Text, View, StyleSheet, Dimensions} from 'react-native';
+import React, { useState } from 'react';
+import { Text, View, StyleSheet, Dimensions, FlatList } from 'react-native';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import SkinBox from './SkinBox';
 import EmojiIcon from './EmojiIcon';
+import Carousel from 'react-native-banner-carousel';
+import { RecyclerListView, DataProvider, LayoutProvider } from "recyclerlistview";
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
     categoryView: {
         position: 'relative',
-        flex: 1
+        flex: 1,
     },
     categoryPageView: {
-        flex: 1,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        paddingHorizontal: 10
+        width: width,
+        height: 220
     },
     categoryLabel: {
         height: 40,
@@ -73,6 +73,27 @@ const CategoryView = ({
         );
     };
 
+    const layoutProviderNews = new LayoutProvider(
+        (index => 0),
+        (type, dim) => {
+            dim.width = width / numRows;
+            dim.height = 40;
+        }
+    );
+    let dataProvider = new DataProvider((r1, r2) => {
+        return r1 !== r2;
+    });
+
+    const rowRendererNews = (type, data) => {
+        return <EmojiIcon
+            emoji={data}
+            clickEmoji={clickEmoji}
+            longPressEmoji={longPressEmoji}
+            emojiWidth={emojiWidth}
+            emojiSize={emojiSize}
+        />
+    }
+
     const renderCategory = () => {
         if (!emojis.length) {
             return <View />;
@@ -90,18 +111,14 @@ const CategoryView = ({
                     style={styles.categoryPageView}
                     key={`page-${i}`}
                     tabLabel={`page-${i}`}>
-                    {currentPageEmojis.map((emoji, key) => {
-                        return (
-                            <EmojiIcon
-                                key={key}
-                                emoji={emoji}
-                                clickEmoji={clickEmoji}
-                                longPressEmoji={longPressEmoji}
-                                emojiWidth={emojiWidth}
-                                emojiSize={emojiSize}
-                            />
-                        );
-                    })}
+                    
+                    <RecyclerListView
+                        contentContainerStyle={styles.recyclerListViewContent}
+                        layoutProvider={layoutProviderNews}
+                        dataProvider={dataProvider.cloneWithRows(currentPageEmojis)}
+                        rowRenderer={rowRendererNews}
+
+                    />
                 </View>
             );
         }
@@ -117,12 +134,15 @@ const CategoryView = ({
                     emojiSize={emojiSize}
                 />
             )}
-            <ScrollableTabView
-                tabBarPosition="top"
-                renderTabBar={() => tabBar()}
-                initialPage={0}>
+            <Carousel
+                autoplay={false}
+                loop
+                index={0}
+                pageSize={width}
+            >
                 {renderCategory()}
-            </ScrollableTabView>
+            </Carousel>
+
         </View>
     );
 };
