@@ -1,15 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {Text, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
 
 const styles = StyleSheet.create({
     emojiTouch: {
         paddingVertical: 5,
+        width: Dimensions.get('window').width / 8,
         height: 40,
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     emoji: {
-        textAlign: 'center'
+        textAlign: 'center',
+        fontSize: 20
     },
     emojiImg: {
         alignSelf: 'center',
@@ -20,19 +22,15 @@ const styles = StyleSheet.create({
 const EmojiIcon = ({
     emoji,
     clickEmoji,
-    longPressEmoji,
-    emojiWidth,
-    emojiSize
 }) => {
     const {code, img} = emoji;
     return (
         <TouchableOpacity
-            style={[styles.emojiTouch, {width: emojiWidth}]}
-            onLongPress={() => (longPressEmoji ? longPressEmoji(emoji) : null)}
+            style={[styles.emojiTouch]}
             onPress={() => clickEmoji(emoji)}>
             {code ?
-                <Text style={[styles.emoji, {fontSize: emojiSize}]}>{code}</Text> :
-                <Image source={{uri: img}} style={[styles.emojiImg, {width: emojiSize, height: emojiSize}]} />
+                <Text style={styles.emoji}>{code}</Text> :
+                null
             }
         </TouchableOpacity>
     );
@@ -46,3 +44,4 @@ EmojiIcon.propTypes = {
     emojiSize: PropTypes.number
 };
 export default EmojiIcon;
+
